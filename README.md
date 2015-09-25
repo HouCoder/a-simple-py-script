@@ -47,6 +47,7 @@ Default: `http://tonni.info/gfwlist.txt`
 指定 GFWList 的地址，这个源是在我 VPS 上的，没有被墙，每 15 分钟会自动下载 Google Code 的 master gfwlist.txt 更新一次。
 
 **dnsServer**
+
 Type: `String`
 
 Default: `208.67.222.222`
@@ -54,6 +55,7 @@ Default: `208.67.222.222`
 DNS 服务器地址，推荐使用 [OpenDNS](https://www.opendns.com/home-internet-security/) 的 DNS 服务。
 
 **dnsPort**
+
 Type: `Int`
 
 Default: 5353
