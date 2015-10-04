@@ -10,20 +10,33 @@ import time
 from datetime import datetime
 from argparse import ArgumentParser
 
-scriptPath = os.path.dirname(os.path.realpath(__file__))
+def prepareLog():
+    global logFile
+    logFilePath = scriptPath + '/gfwlist2dnsmasq.log'
 
-def message(msg, log=True):
-    print msg
+    # The maximum log file size is 128 KB;
+    maxSize     = 128 * 1000;
+
+    if os.path.exists(logFilePath) and os.path.getsize(logFilePath) < maxSize:
+        logFileMode = 'a'
+    else:
+        logFileMode = 'w'
+
+    logFile = open(logFilePath, logFileMode)
+
+def message(msg, log=True, separation=False):
+    if not separation:
+        print msg
 
     if not log:
         return
 
-    logFilePath = scriptPath + '/gfwlist2dnsmasq.log'
-    mode        = 'a' if os.path.exists(logFilePath) else 'w'
-    now         = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    now  = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-    with open(logFilePath, mode) as logFile:
+    if not separation:
         logFile.write('[%(now)s] %(message)s \n' % {'now': now, 'message': msg})
+    else:
+        logFile.write('%(message)s \n' % {'message': msg})
 
 def getRootNameList(domainList):
     tldList    = getTldList()
@@ -66,7 +79,6 @@ def getHostname(hostList):
 
     return hostnameList
 
-
 def getTldList():
     tldList = []
 
@@ -78,8 +90,10 @@ def getTldList():
 
     return tldList
 
-def getGfwList(path, base64Encoded=False):
+def getList(path, isGFWList=False):
+
     if os.path.isfile(path):
+
         # The list is from local.
         message('Getting list from: ' + path + ' ...')
 
@@ -87,22 +101,18 @@ def getGfwList(path, base64Encoded=False):
             rawGfwList = localList.read()
 
     elif urlparse.urlparse(path).scheme:
+
         # The list is from internet.
         try:
-            message('Downloading GFWList from: ' + path + ' ...')
+            message('Downloading list from: ' + path + ' ...')
             rawGfwList = urllib2.urlopen(path, timeout = 10).read()
         except Exception, e:
-            message('Download GfwList failed: ' + str(e))
+            message('Download list failed: ' + str(e))
             sys.exit(1)
 
     else:
         message('Invalid file:' + path)
         return
-
-    if base64Encoded:
-        gfwList = base64.b64decode(rawGfwList).splitlines()
-    else:
-        gfwList = rawGfwList.splitlines()
 
     result  = {
         'updateTime': None,
@@ -111,7 +121,13 @@ def getGfwList(path, base64Encoded=False):
         'list'      : []
     }
 
-    # Parse GFWList
+    # The GFWList is base64 encoded string
+    if isGFWList:
+        gfwList = base64.b64decode(rawGfwList).splitlines()
+    else:
+        gfwList = rawGfwList.splitlines()
+
+    # Parse list
     for line in gfwList:
 
         if line.find('Last Modified') >= 0:
@@ -146,7 +162,7 @@ def getGfwList(path, base64Encoded=False):
 
     result['length'] = len(result['list'])
 
-    message('Got ' + str(result['length']) + ' rules from ' + path)
+    message('Got ' + str(result['length']) + ' rules from: ' + path)
 
     return result
 
@@ -180,7 +196,7 @@ def generatingConfigFile(allList, config):
         '\n'
     ])
 
-    with open(config['targetFile'], 'w+') as configFile:
+    with open(config['targetFile'], 'w') as configFile:
         configFile.write(header)
 
         for listItem in allList:
@@ -202,12 +218,10 @@ def perpreArgs():
 
 def getConfig(args):
     userConfig = {};
+    configKeys = ['sourceUrl', 'dnsServer', 'dnsPort', 'userList', 'ipsetName',
+                  'targetFile', 'callbackCommand']
 
-    if args.config == None:
-        message('Starting with default config. You can specific configuration file by using -c/--config')
-    else:
-        message('Starting with config file: ' + args.config)
-
+    if args.config:
         try:
             with open(args.config) as userConfig:
                 userConfig = json.loads( userConfig.read() )
@@ -219,59 +233,49 @@ def getConfig(args):
     with open(scriptPath + '/resources/default-config.json') as defaultConfig:
         defaultConfig = json.loads( defaultConfig.read() )
 
-    config = {
-        'sourceUrl': userConfig['sourceUrl'] if
-                                                'sourceUrl' in userConfig and userConfig['sourceUrl']
-                                            else
-                                                defaultConfig['sourceUrl'],
+        defaultConfig['targetFile'] = scriptPath +  '/' + defaultConfig['targetFile']
 
-        'dnsServer': userConfig['dnsServer'] if
-                                                'dnsServer' in userConfig and userConfig['dnsServer']
-                                            else
-                                                defaultConfig['dnsServer'],
 
-        'dnsPort': userConfig['dnsPort'] if
-                                                'dnsPort' in userConfig and userConfig['dnsPort']
-                                            else
-                                                defaultConfig['dnsPort'],
+    for configKey in configKeys:
+        if configKey not in userConfig.keys() and configKey in defaultConfig.keys() and defaultConfig[configKey]:
 
-        'userList': userConfig['userList'] if
-                                                'userList' in userConfig and userConfig['userList']
-                                            else
-                                                None,
+            userConfig[configKey] = defaultConfig[configKey]
 
-        'ipsetName': userConfig['ipsetName'] if
-                                                'ipsetName' in userConfig and userConfig['ipsetName']
-                                            else
-                                                defaultConfig['ipsetName'],
+        elif configKey not in userConfig.keys() and configKey not in defaultConfig.keys():
 
-        'targetFile': userConfig['targetFile'] if
-                                                'targetFile' in userConfig and userConfig['targetFile']
-                                            else
-                                                scriptPath +  '/' + defaultConfig['targetFile'],
+            userConfig[configKey] = None
 
-        'callbackCommand': userConfig['callbackCommand'] if
-                                                'callbackCommand' in userConfig and userConfig['callbackCommand']
-                                            else
-                                                None
-    }
-
-    return config
+    return userConfig
 
 def main():
-    allList        = []
-    args           = perpreArgs()
+    global scriptPath
+
+    allList    = []
+    args       = perpreArgs()
+    scriptPath = os.path.dirname(os.path.realpath(__file__))
+
+    prepareLog()
+
+    if args.config == None:
+        message('Starting with default config. You can specific configuration file by using -c/--config')
+    else:
+        message('Starting with the config file: ' + args.config)
+
     configurations = getConfig(args)
 
     # Getting list from GFWList
-    gfwList = getGfwList(configurations['sourceUrl'], True)
+    gfwList = getList(configurations['sourceUrl'], True)
     gfwList['list'] = getHostname(gfwList['list'])
     gfwList['list'] = getRootNameList(gfwList['list'])
+
+    if len(gfwList['list']) == 0:
+        message('ERROR: The GFWList is empty')
+        sys.exit(1)
 
     allList[len(allList):] = [gfwList]
 
     # Getting list from extends file
-    extendsList = getGfwList(scriptPath + '/resources/extends.txt')
+    extendsList = getList(scriptPath + '/resources/extends.txt')
     extendsList['list'] = getHostname(extendsList['list'])
     extendsList['list'] = getRootNameList(extendsList['list'])
 
@@ -282,7 +286,7 @@ def main():
         userListPath = configurations['userList'].split('|')
 
         for path in userListPath:
-            userListItem = getGfwList(path)
+            userListItem = getList(path)
             userListItem['list'] = getHostname(userListItem['list'])
 
             allList[len(allList):] = [userListItem]
@@ -293,6 +297,12 @@ def main():
     # Run callback command if has
     if configurations['callbackCommand']:
         runCallback(configurations['callbackCommand'])
+
+    # Add a new empty line, make the log easy to read
+    message('', True, True)
+
+    # Closing log file
+    logFile.close()
 
 if __name__ == '__main__':
     main()
