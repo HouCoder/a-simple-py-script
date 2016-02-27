@@ -32,6 +32,8 @@ Since only mainland Chinese users have this kind of network issue, I wrote the R
 
 `$ python main.py -c ~/user-config.json`
 
+出于对于低配置的路由器容量考虑，`gfwlist2dnsmasq.log` 文件大小最大值为 `128KB` ，超过该值 log 文件将会被清空。
+
 ### 可配置项
 
 JSON 文件示例可以参考 `user-config.json.example`.
@@ -114,7 +116,7 @@ No default
 
 ### TODO
 
-- [ ] 最大 log 限制。
+- [x] 最大 log 限制。
 - [ ] Proxy 支持，以便直接使用托管在 Google Code 上的 GFWList。
 
 ### 反馈
