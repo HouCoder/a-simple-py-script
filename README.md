@@ -44,7 +44,7 @@ Type: `String`
 
 Default: `http://tonni.info/gfwlist.txt`
 
-指定 GFWList 的地址，这个源是在我 VPS 上的，没有被墙，每 15 分钟会自动下载 Google Code 的 master gfwlist.txt 更新一次。
+指定 GFWList 的地址，这个源是在我 VPS 上的，没有被墙，每 15 分钟会自动下载 GitHub 上的 gfwlist.txt 更新一次。
 
 **dnsServer**
 

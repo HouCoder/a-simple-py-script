@@ -290,7 +290,7 @@ def main():
     # Generating config file
     generatingConfigFile(allList, configurations)
 
-    # Run callback command if has
+    # Run callback command if it exists
     if configurations['callbackCommand']:
         runCallback(configurations['callbackCommand'])
 
