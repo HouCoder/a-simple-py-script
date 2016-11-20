@@ -2,7 +2,7 @@
 
 Convert [GFWList](https://autoproxy-gfwlist.googlecode.com/svn/trunk/gfwlist.txt) to [Dnsmasq](http://www.thekelleys.org.uk/dnsmasq/doc.html) configuration file.
 
-Since only mainland Chinese users have this kind of network issue, I wrote the README file in Chinese. If you have any question, Please let me know.
+Since only mainland Chinese users have this kind of network issue, I wrote the README file in Chinese. If you have any question, Please [let me know](https://github.com/HouCoder/gfwlist2dnsmasq/issues/new).
 
 ### 运行环境
 
@@ -11,6 +11,8 @@ Since only mainland Chinese users have this kind of network issue, I wrote the R
 1. Python 2.6.6 on CentOS 6.5
 1. Python 2.7.3 on OpenWrt
 1. Python 2.7.10 on OS X 10.10.5
+
+建议在路由器上运行的用户使用 `$ opkg install python` 确保满足依赖。
 
 如果程序运行异常请在 issues 里面反馈，反馈时需要的基本信息包括：Python 版本、系统环境和错误消息。
 
@@ -117,7 +119,6 @@ No default
 ### TODO
 
 - [x] 最大 log 限制。
-- [ ] Proxy 支持，以便直接使用托管在 Google Code 上的 GFWList。
 
 ### 反馈
 
