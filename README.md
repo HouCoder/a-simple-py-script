@@ -2,17 +2,18 @@
 
 Convert [GFWList](https://autoproxy-gfwlist.googlecode.com/svn/trunk/gfwlist.txt) to [Dnsmasq](http://www.thekelleys.org.uk/dnsmasq/doc.html) configuration file.
 
-Since only mainland Chinese users have this kind of network issue, I wrote the README file in Chinese. If you have any question, Please [let me know](https://github.com/HouCoder/gfwlist2dnsmasq/issues/new).
+Since only mainland Chinese users have this kind of network issue, so I wrote the README file in Chinese. If you have any question, Please [let me know](https://github.com/HouCoder/gfwlist2dnsmasq/issues/new).
 
 ### 运行环境
 
-在下面的 Python 环境中测试使用正常：
+建议在路由器上运行的用户使用 `$ opkg install python` 确保满足依赖。
+
+脚本在下面的 Python 环境中测试使用正常：
 
 1. Python 2.6.6 on CentOS 6.5
-1. Python 2.7.3 on OpenWrt
+1. Python 2.7.3 on OpenWrt 14.07
+1. Python 2.7.9 on OpenWrt 15.05
 1. Python 2.7.10 on OS X 10.10.5
-
-建议在路由器上运行的用户使用 `$ opkg install python` 确保满足依赖。
 
 如果程序运行异常请在 issues 里面反馈，反馈时需要的基本信息包括：Python 版本、系统环境和错误消息。
 
@@ -30,11 +31,12 @@ Since only mainland Chinese users have this kind of network issue, I wrote the R
 
 执行完成后在程序目录里面会发现两个文件：`gfwlist2dnsmasq.log` 和 `dnsmasq.conf`，前者是程序 log 文件，便于 Debug 时使用；后者即是我们想要的 Dnsmasq 配置文件。
 
+出于对于低配置的路由器容量考虑，`gfwlist2dnsmasq.log` 文件大小最大值为 `128KB` ，超过该值 log 文件将会被清空。
+
 当然你也可以指定自己的 **JSON** 格式的配置文件，程序会根据用户不同的配置生成不同的 Dnsmasq 配置：
 
 `$ python main.py -c ~/user-config.json`
 
-出于对于低配置的路由器容量考虑，`gfwlist2dnsmasq.log` 文件大小最大值为 `128KB` ，超过该值 log 文件将会被清空。
 
 ### 可配置项
 

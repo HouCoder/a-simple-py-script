@@ -41,7 +41,7 @@ def message(msg, log=True, separation=False):
 def getRootNameList(domainList):
     tldList    = getTldList()
 
-    # Why use `set`? because it also will remove duplicates rules from list:
+    # `set` also removes duplicated rules from list:
     # https://docs.python.org/2/library/sets.html
     resultList = set()
 
@@ -107,7 +107,7 @@ def getList(path, isGFWList=False):
             message('Downloading list from: ' + path + ' ...')
             rawGfwList = urllib2.urlopen(path, timeout = 10).read()
         except Exception, e:
-            message('Download list failed: ' + str(e))
+            message('Downloading list failed: ' + str(e))
             sys.exit(1)
 
     else:
@@ -210,9 +210,7 @@ def perpreArgs():
     parser = ArgumentParser()
 
     parser.add_argument('-c', '--config', dest='config',
-                        help='Specifically usea configuration file.' +
-                             'You can check the README file to know how to' +
-                             'create a config file.')
+                        help='Use specific configuration file.')
 
     return parser.parse_args()
 
@@ -257,9 +255,9 @@ def main():
     prepareLog()
 
     if args.config == None:
-        message('Starting with default config. You can specific configuration file by using -c/--config')
+        message('Starting with default config. You can specific configuration file by -c/--config parameter')
     else:
-        message('Starting with the config file: ' + args.config)
+        message('Starting with specific config file: ' + args.config)
 
     configurations = getConfig(args)
 
@@ -298,7 +296,7 @@ def main():
     if configurations['callbackCommand']:
         runCallback(configurations['callbackCommand'])
 
-    # Add a new empty line, make the log easy to read
+    # Add a new empty line, improve the log file readability.
     message('', True, True)
 
     # Closing log file
