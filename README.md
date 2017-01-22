@@ -1,6 +1,6 @@
 # GFWList2Dnsmasq
 
-Convert [GFWList](https://autoproxy-gfwlist.googlecode.com/svn/trunk/gfwlist.txt) to [Dnsmasq](http://www.thekelleys.org.uk/dnsmasq/doc.html) configuration file.
+Convert [GFWList](https://github.com/gfwlist/gfwlist) to [Dnsmasq](http://www.thekelleys.org.uk/dnsmasq/doc.html) configuration file.
 
 Since only mainland Chinese users have this kind of network issue, so I wrote the README file in Chinese. If you have any question, Please [let me know](https://github.com/HouCoder/gfwlist2dnsmasq/issues/new).
 
@@ -8,7 +8,7 @@ Since only mainland Chinese users have this kind of network issue, so I wrote th
 
 建议在路由器上运行的用户使用 `$ opkg install python` 确保满足依赖。
 
-脚本在下面的 Python 环境中测试使用正常：
+在下面的 Python 环境中测试使用正常：
 
 1. Python 2.6.6 on CentOS 6.5
 1. Python 2.7.3 on OpenWrt 14.07
@@ -50,7 +50,7 @@ Type: `String`
 
 Default: `http://tonni.info/gfwlist.txt`
 
-指定 GFWList 的地址，这个源是在我 VPS 上的，没有被墙，每 15 分钟会自动下载 GitHub 上的 gfwlist.txt 更新一次。
+指定 GFWList 的地址，这个源是在我 VPS 上的，没有被墙，每 10 分钟会自动下载 GitHub 上的 gfwlist.txt 更新一次。
 
 **dnsServer**
 
@@ -110,13 +110,13 @@ No default
 
 ### 自动更新配置
 
-在路由器上安装、配置完成后测试无异常可以使用 Cron Jobs 每日更新配置文件，添加下面的规则至 `/etc/crontab` 即可实现每天凌晨五点更新一次列表：
+在路由器上安装配置完成后测试无异常可以使用 cron 定时更新配置文件，添加下面的规则至 cron 即可实现每天凌晨五点更新一次列表：
 
 ```
-00 05 * * * python PATH_TO_FILE.py
+00 05 * * * python PATH_TO_FILE.py -c YOUR_CONFIG_FILE
 ```
+
 指定 `targetFile` 到 Dnsmasq 配置目录，记得将 `callbackCommand` 设置为 `/etc/init.d/dnsmasq restart`，重启 Dnsmasq 以保证配置生效。
-
 
 ### TODO
 
