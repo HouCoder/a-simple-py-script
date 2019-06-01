@@ -166,14 +166,6 @@ def getList(path, isGFWList=False):
 
     return result
 
-def runCallback(command):
-    message('Running command: ' + command + '...')
-
-    if os.system(command) == 0:
-        message(command + ' succeeded')
-    else:
-        message(command + ' failed')
-
 def generatingConfigFile(allList, config):
     message('Generating config file...')
 
@@ -217,7 +209,7 @@ def perpreArgs():
 def getConfig(args):
     userConfig = {};
     configKeys = ['sourceUrl', 'dnsServer', 'dnsPort', 'userList', 'ipsetName',
-                  'targetFile', 'callbackCommand']
+                  'targetFile']
 
     if args.config:
         try:
@@ -291,10 +283,6 @@ def main():
 
     # Generating config file
     generatingConfigFile(allList, configurations)
-
-    # Run callback command if it exists
-    if configurations['callbackCommand']:
-        runCallback(configurations['callbackCommand'])
 
     # Add a new empty line, improve the log file readability.
     message('', True, True)

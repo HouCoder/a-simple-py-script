@@ -48,9 +48,7 @@ JSON 文件示例可以参考 `user-config.json.example`.
 
 Type: `String`
 
-Default: `http://tonni.info/gfwlist.txt`
-
-指定 GFWList 的地址，这个源是在我 VPS 上的，没有被墙，每 10 分钟会自动下载 GitHub 上的 gfwlist.txt 更新一次。
+指定 GFWList 的地址。
 
 **dnsServer**
 
@@ -100,14 +98,6 @@ Default: `dnsmasq.conf`
 
 默认会将列表生成到程序目录的 `dnsmasq.conf` 文件里面。
 
-**callbackCommand**
-
-Type: `String`
-
-No default
-
-配置文件生成后如果有设置回调将会执行回调命令，这个参数主要作用请参考下一节。
-
 ### 自动更新配置
 
 在路由器上安装配置完成后测试无异常可以使用 cron 定时更新配置文件，添加下面的规则至 cron 即可实现每天凌晨五点更新一次列表：
@@ -116,7 +106,7 @@ No default
 00 05 * * * python PATH_TO_FILE.py -c YOUR_CONFIG_FILE
 ```
 
-指定 `targetFile` 到 Dnsmasq 配置目录，记得将 `callbackCommand` 设置为 `/etc/init.d/dnsmasq restart`，重启 Dnsmasq 以保证配置生效。
+指定 `targetFile` 到 Dnsmasq 配置目录，记得重启 Dnsmasq 以保证配置生效。
 
 ### TODO
 
